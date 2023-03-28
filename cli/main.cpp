@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 #include <filesystem>
 #include <string>
 #include <boost/program_options.hpp>
@@ -6,23 +7,29 @@
 using fpath = std::filesystem::path;
 
 void download(const std::string& file) {
-    const fpath p {std::filesystem::current_path()};
+    const fpath p{std::filesystem::current_path()};
     bool found = false;
-    for (const std::filesystem::directory_entry& x : std::filesystem::directory_iterator{p}) {
+    for (const std::filesystem::directory_entry &x: std::filesystem::directory_iterator{p}) {
         auto entry_str = std::string(x.path());
-        if (entry_str.substr(entry_str.find_last_of('/') + 1) == file)
+        if (entry_str.substr(entry_str.find_last_of('/') + 1) == file) {
             found = true;
+            break;
+        }
     }
     if (found)
         std::cout << "such file already exists\n";
-    else
-        std::cout << "downloading of file: \"" << file << "\" started\n";
+    else {
+        std::ofstream file_to_download;
+        file_to_download.open(std::string(p) + "/" + file);
+        file_to_download.close();
+        std::cout << "\"" << file << "\" is downloaded\n";
+    }
 }
 
 void upload(const std::string& file) {
-    const fpath p {std::filesystem::current_path()};
+    const fpath p{std::filesystem::current_path()};
     bool found = false;
-    for (const std::filesystem::directory_entry& x : std::filesystem::directory_iterator{p}) {
+    for (const std::filesystem::directory_entry &x: std::filesystem::directory_iterator{p}) {
         auto entry_str = std::string(x.path());
         if (entry_str.substr(entry_str.find_last_of('/') + 1) == file)
             found = true;
