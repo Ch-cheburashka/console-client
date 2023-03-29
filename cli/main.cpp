@@ -31,13 +31,31 @@ void upload(const std::string& file) {
     bool found = false;
     for (const std::filesystem::directory_entry &x: std::filesystem::directory_iterator{p}) {
         auto entry_str = std::string(x.path());
-        if (entry_str.substr(entry_str.find_last_of('/') + 1) == file)
+        if (entry_str.substr(entry_str.find_last_of('/') + 1) == file) {
             found = true;
+            break;
+        }
     }
     if (!found)
         std::cout << "such file doesn't exists\n";
-    else
-        std::cout << "uploading of file: \"" << file << "\" started\n";
+    else {
+        std::string res;
+        std::ifstream file_to_read;
+        file_to_read.open(file);
+        char ch;
+        int str_index = 0;
+        while (file_to_read.get(ch)) {
+            if (ch == '\n') {
+                str_index++;
+                if (str_index > 2 && str_index%100 == 0) {
+                    std::cout << res << "hundred\n";
+                    res.clear();
+                }
+            }
+            res += ch;
+        }
+        std::cout << res << "\n";
+    }
 }
 
 
